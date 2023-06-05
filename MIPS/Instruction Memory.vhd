@@ -1,0 +1,43 @@
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity Instruction_Memory is 
+port
+(
+	PC: in std_logic_vector(31 downto 0);
+	instruction: out std_logic_vector(31 downto 0)
+);
+end Instruction_Memory;
+
+
+architecture Behavioral of Instruction_Memory is
+	signal addr : std_logic_vector(31 downto 0);
+	type iArray is array(0 to 15) of std_logic_vector(31 downto 0);
+ 
+	constant Instructions: iArray := 
+	(
+		"00100000000000110000000000000001",
+		"00100000000001010000000000000011",
+		"00000000011000000011000000100000",
+		"00100000011000110000000000000001",
+		"00100000100001000000000000000001",
+		"00100000101001011111111111111111",
+		"00010100101000000000000000010000",
+		"00000000000000000000000000000000",
+		"00000000000000000000000000000000",
+		"00000000000000000000000000000000",
+		"00000000000000000000000000000000",
+		"00000000000000000000000000000000",
+		"00000000000000000000000000000000",
+		"00000000000000000000000000000000",
+		"00000000000000000000000000000000",
+		"00000000000000000000000000000000"
+	);
+begin
+
+	addr <= PC;
+	instruction <= Instructions(to_integer(unsigned(addr))) when PC < X"00000020" else X"00000000";
+
+end Behavioral;
