@@ -2,22 +2,22 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-entity mux21 is port
+entity mux21_32 is port
 	(
-		ALU_Result, readData : in std_logic_vector(31 downto 0);
-		MemtoReg: in std_logic;
-		writeData: out std_logic_vector(31 downto 0)
+		A, B : in std_logic_vector(31 downto 0);
+		S : in std_logic;
+		res: out std_logic_vector(31 downto 0)
 	);
-end mux21;
+end mux21_32;
 
-architecture mux32 of mux21 is
+architecture mux32 of mux21_32 is
 begin
-	process(MemtoReg, ALU_Result, readData)
+	process(A, B, S)
 	begin
-		if MemtoReg = '0' then
-			writeData <= ALU_Result;
-		elsif MemtoReg = '1' then
-			writeData <= readData;
+		if S = '0' then
+			res <= A;
+		elsif S = '1' then
+			res <= B;
 		end if;
 	end process;
 end mux32;
