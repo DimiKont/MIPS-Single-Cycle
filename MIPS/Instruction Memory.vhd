@@ -47,10 +47,5 @@ architecture InstructionMem of InstructionMemory is
 		"00000000000000000000000000000000"
 	);
 begin
-	process(clock)
-	begin
-		if clock'event and clock = '1' then
-			instruction <= Instructions(to_integer(unsigned(PC)));
-		end if;
-	end process;
+	instruction <= Instructions(to_integer(unsigned(PC)));
 end InstructionMem;

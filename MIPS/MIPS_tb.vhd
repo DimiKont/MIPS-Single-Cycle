@@ -7,6 +7,7 @@ entity MIPS_tb is
 end MIPS_tb;
 
 architecture testbench of MIPS_tb is
+
 	signal clock, reset : std_logic;
 	constant clk_period : time := 100 ps;
 
@@ -25,9 +26,9 @@ begin
 	begin
 		clock <= '0';
 		while now < 5000 ps loop
-			wait for clk_period;
+			wait for clk_period/2;
 			clock <= not clock;
-			wait for clk_period;
+			wait for clk_period/2;
 			clock <= not clock;
 		end loop;
 		wait;
@@ -36,7 +37,7 @@ begin
 	stimulus_process : process
 	begin
 		reset <= '1';
-		wait for 80 ps;
+		wait for 20 ps;
 		reset <= '0';
 		wait;
 	end process;

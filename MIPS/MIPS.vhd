@@ -2,7 +2,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-
 -- MIPS Entity
 
 entity MIPS is port
@@ -14,7 +13,8 @@ end MIPS;
 
 library ieee;
 use ieee.std_logic_1164.all;
-
+use ieee.std_logic_unsigned.all;
+use ieee.numeric_std.all;
 
 -- ALU Entity
 
@@ -26,13 +26,6 @@ entity ALU is port
 	zero: out std_logic
 );
 end ALU;
-
-
-
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.std_logic_unsigned.all;
-use ieee.numeric_std.all;
 
 
 -- ALU Architecture
@@ -57,12 +50,8 @@ begin
 end alu;
 
 
-
-
 library ieee;
 use ieee.std_logic_1164.all;
-
-
 
 -- Register File Entity
 
@@ -137,7 +126,6 @@ entity DataMemory is port
 );
 end DataMemory;
 
-
 -- Data Memory Architecture
 
 architecture datamem of DataMemory is
@@ -159,7 +147,6 @@ end datamem;
 
 
 
-
 library ieee;
 use ieee.std_logic_1164.all;
 
@@ -170,7 +157,6 @@ entity mux21 is port
 		result: out std_logic_vector(4 downto 0)
 	);
 end mux21;
-
 
 architecture mux5b of mux21 is
 begin
@@ -219,11 +205,9 @@ entity InstructionMemory is
 port
 (
 	PC: in std_logic_vector(31 downto 0);
-	clock: in std_logic;
 	instruction: out std_logic_vector(31 downto 0)
 );
 end InstructionMemory;
-
 
 architecture InstructionMem of InstructionMemory is
 	-- signal addr : std_logic_vector(31 downto 0);
@@ -234,7 +218,7 @@ architecture InstructionMem of InstructionMemory is
 		-- addi $0, $0, 0
 		"00100000000000000000000000000000",
 		-- addi $2, $2, 0
-		"00100000010001000000000000000000",
+		"00100000010000100000000000000000",
 		-- addi $2, $4, 0
 		"00100000100000100000000000000000",
 		-- addi $3, $0, 1
@@ -260,46 +244,36 @@ architecture InstructionMem of InstructionMemory is
 		"00000000000000000000000000000000"
 	);
 begin
-	process(clock)
-	begin
-		if clock'event and clock = '1' then
-			instruction <= Instructions(to_integer(unsigned(PC)));
-		end if;
-	end process;
+	instruction <= Instructions(to_integer(unsigned(PC)));
 end InstructionMem;
 
 
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use ieee.std_logic_unsigned.all;
 
 entity PC is port
 (
+	reset, clock : in std_logic;
 	PC_in: in std_logic_vector(31 downto 0);
 	PC_out : out std_logic_vector(31 downto 0)
+
 );
 end PC;
 
-
--- Program Counter Architecture
-
-architecture behavioral of PC is
+architecture pc of PC is
 begin
-	PC_out <= PC_in;
-end behavioral;
-
-
-
-
-library ieee;
-use ieee.std_logic_1164.all;
-
- entity SignExtension is port
-	(
-		inBits: in std_logic_vector(15 downto 0);
-		outBits: out std_logic_vector(31 downto 0)
-	);
-end SignExtension;
+	process(reset, clock)	
+	begin
+		if reset = '1' then
+			PC_out <= X"00000000";
+		elsif clock'event and clock = '1' then
+			PC_out <= PC_in;
+		end if;
+	end process;
+end pc;
 
 
 
@@ -308,6 +282,12 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.numeric_std.all;
 
+ entity SignExtension is port
+	(
+		inBits: in std_logic_vector(15 downto 0);
+		outBits: out std_logic_vector(31 downto 0)
+	);
+end SignExtension;
 
 architecture SignEx of SignExtension is
 begin
@@ -323,10 +303,8 @@ end SignEx;
 
 
 
-
 library ieee;
 use ieee.std_logic_1164.all;
-
 
 entity ALU_Ctl is port
 (
@@ -350,7 +328,6 @@ end Control;
 library ieee;
 use ieee.std_logic_1164.all;
 
-
 entity Control_Unit is port
 (
 	opcode: in std_logic_vector(5 downto 0);
@@ -359,7 +336,6 @@ entity Control_Unit is port
 	
 );
 end Control_Unit;
-
 
 architecture Behavioral of Control_Unit is
 begin
@@ -409,7 +385,6 @@ begin
 				MemWrite <= '1';
 				Branch <= '0';
 				ALUOp <= "00";
-
 			-- For Branch Instructions
 			when "000100" =>
 				RegDst <= 'X';
@@ -436,47 +411,23 @@ end Behavioral;
 
 
 
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std_unsigned.all;
 
 entity PCaddr is port
 	(
-		PC: in std_logic_vector(31 downto 0);
-		PCnext: out std_logic_vector (31 downto 0)
+		in1, in2: in std_logic_vector(31 downto 0);
+		addrout: out std_logic_vector (31 downto 0)
 	);
 end PCaddr;
 
-
-
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.std_logic_unsigned.all;
-use ieee.numeric_std.all;
-
-
-architecture PCnext of PCaddr is
+architecture PCAfter of PCaddr is
 begin
-	PCnext <= PC + 1;
-end PCnext;
+	addrout <= in1 + in2;
+end PCAfter;
 
-
-
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std_unsigned.all;
-
-entity PCaddr2 is port
-	(
-		PCafter, signex: in std_logic_vector(31 downto 0);
-		PCtomux: out std_logic_vector (31 downto 0)
-	);
-end PCaddr2;
-
-architecture PCafter of PCaddr2 is
-begin
-	PCtomux <= PCafter + signex;
-end PCafter;
 
 
 library ieee;
@@ -489,7 +440,7 @@ use ieee.numeric_std.all;
 -- MIPS Architecture
 
 architecture dataflow of MIPS is
-	signal pcn, PC_current, PC_next : std_logic_vector(31 downto 0);
+	signal PC_current, PC_next : std_logic_vector(31 downto 0);
 	signal instr : std_logic_vector(31 downto 0);
 	signal regdst, memtoreg, branch, memread, memwrite, alusrc, regwrite : std_logic;
 	signal aluop : std_logic_vector(1 downto 0);
@@ -510,8 +461,9 @@ architecture dataflow of MIPS is
 	signal towritedata: std_logic_vector(31 downto 0);
 
 	signal pctomux: std_logic_vector(31 downto 0);
-	signal addr2res : std_logic_vector(31 downto 0);
+	signal addr1res, addr2res : std_logic_vector(31 downto 0);
 	signal saddr : std_logic;
+	signal muxtopc : std_logic_vector(31 downto 0);
 
 	-- signal OPCode : std_logic_vector(5 downto 0);
 
@@ -550,7 +502,6 @@ architecture dataflow of MIPS is
 	component InstructionMemory is port
 	(
 		PC : in std_logic_vector(31 downto 0);
-		clock : in std_logic;
 		instruction: out std_logic_vector(31 downto 0)
 	);
 	end component InstructionMemory;
@@ -575,6 +526,7 @@ architecture dataflow of MIPS is
 	-- Program Counter
 	component PC is port 
 	(
+		reset, clock : in std_logic;
 		PC_in : in std_logic_vector(31 downto 0);
 		PC_out: out std_logic_vector(31 downto 0)
 	);
@@ -582,8 +534,8 @@ architecture dataflow of MIPS is
 
 	component PCaddr is port
 	(
-		PC : in std_logic_vector(31 downto 0);
-		PCnext : out std_logic_vector(31 downto 0)
+		in1, in2 : in std_logic_vector(31 downto 0);
+		addrout : out std_logic_vector(31 downto 0)
 	);
 	end component PCaddr;
 
@@ -610,36 +562,22 @@ architecture dataflow of MIPS is
 	);
 	end component ALU_Ctl;
 
-	component PCafter is port
-	(
-		PCafter, signex: in std_logic_vector(31 downto 0);
-		PCtomux: out std_logic_vector (31 downto 0)
-	);
-	end component PCafter;
-
 begin
-	process(clock, reset)
-	begin
-		if(reset = '1') then
-			PC_current <= X"00000000";
-		else
-			PC_current <= PC_next;
-		end if;
-	end process;
+
 	-- Program Counter Initialization
 	PC_init: PC
 		port map
 		(
-			PC_in => addr2res,		
-			PC_out => Pcn
+			reset => reset,
+			clock => clock,
+			PC_in => PC_next,		
+			PC_out => PC_current
 		);
-
 	
 	InstMemory_init: InstructionMemory
 		port map
 		(
 			PC => PC_current,
-			clock => clock,
 			instruction => instr
 		);
 	
@@ -656,7 +594,6 @@ begin
 			ALUSrc => alusrc,
 			RegWrite => regwrite
     		);
-
 	
 	reg_mux: mux21
 		port map
@@ -666,7 +603,6 @@ begin
 			inputB => instr(15 downto 11),
 			result => writereg
 		);
-
 
 	RegFile_init: RegisterFile
 		port map
@@ -682,7 +618,6 @@ begin
 			ReadData2 => readdata2
 		);
 
-	
 	SignEx_init: SignExtension
 		port map
 		(
@@ -741,28 +676,26 @@ begin
 	PCaddr_init : PCaddr
 		port map
 		(
-			PC => PC_current,
-			PCnext => PC_next
+			in1 => PC_current,
+			in2 => X"00000001",
+			addrout => PC_next
 		);
 
-	PCaddr2_init: PCafter
+	PCaddr2_init : PCaddr
 		port map
 		(
-			PCafter => PC_next,
-			signex => signExout,
-			PCtomux => pctomux
+			in1 => PC_next,
+			in2 => signExout,
+			addrout => addr2res
 		);
-	
 
 	saddr <= branch AND Zero;
-
 	addrmux : mux21_32
 		port map
 		(
 			A => PC_next,
-			B => pctomux,
+			B => addr2res,
 			S => saddr,
-			res => addr2res
+			res => muxtopc
 		);
-	
 end dataflow;

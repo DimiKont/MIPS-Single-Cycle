@@ -4,6 +4,7 @@ use ieee.std_logic_1164.all;
 
 entity Control_Unit is port
 (
+	reset : in std_logic;
 	opcode: in std_logic_vector(5 downto 0);
 	RegDst, ALUSrc, MemtoReg, RegWrite, MemRead, MemWrite, Branch : out std_logic;
 	ALUOp : out std_logic_vector(1 downto 0)
@@ -15,6 +16,7 @@ architecture Behavioral of Control_Unit is
 begin
 	process(opcode)
 	begin
+		
 		case opcode is
 			-- For add and sub Instructions
 			when "000000" =>
