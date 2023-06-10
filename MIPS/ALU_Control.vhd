@@ -15,5 +15,5 @@ begin
 	ALU_Control(3) <= '0';
 	ALU_Control(2) <= ALUOp(0) OR (ALUOp(1) AND Funct(1));
 	ALU_Control(1) <= NOT ALUOp(1) OR NOT Funct(2);
-	ALU_Control(0) <= ALUOp(1) AND (Funct(3) OR Funct(0));
+	ALU_Control(0) <= (Funct(3) OR Funct(0)) AND ALUOp(1);
 end Control;

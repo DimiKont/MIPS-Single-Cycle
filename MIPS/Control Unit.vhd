@@ -6,7 +6,7 @@ entity Control_Unit is port
 (
 	reset : in std_logic;
 	opcode: in std_logic_vector(5 downto 0);
-	RegDst, ALUSrc, MemtoReg, RegWrite, MemRead, MemWrite, Branch : out std_logic;
+	RegDst, ALUSrc, MemtoReg, RegWrite, MemRead, MemWrite, Branch, BNE : out std_logic;
 	ALUOp : out std_logic_vector(1 downto 0)
 	
 );
@@ -61,15 +61,16 @@ begin
 				MemWrite <= '1';
 				Branch <= '0';
 				ALUOp <= "00";
-			-- For Branch Instructions
-			when "000100" =>
+			-- For BNE Instructions
+			when "000101" =>
+				BNE <= '1';
 				RegDst <= 'X';
 				ALUSrc <= '0';
 				MemtoReg <= 'X';
 				RegWrite <= '0';
 				MemRead <= '0';
 				MemWrite <= '0';
-				Branch <= '1';
+				Branch <= '0';
 				ALUOp <= "01";
 			when others =>
 		                RegDst    <= 'X';

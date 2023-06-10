@@ -26,7 +26,6 @@ begin
 			when "100" => tmp <= inputA NOR inputB;
 			when others => tmp <= inputA + inputB;
 		end case;
-
 	end process;
 	zero <= '1' when tmp = X"00000000" else '0';
 	ALU_Result <= tmp;

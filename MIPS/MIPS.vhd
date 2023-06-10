@@ -36,28 +36,29 @@ begin
 	process(inputA, inputB, ALU_Ctl)
 	begin
 		case ALU_Ctl is
-			when "0000" => tmp <= inputA + inputB;
-			when "0001" => tmp <= inputA - inputB;
-			when "0010" => tmp <= inputA AND inputB;
-			when "0011" => tmp <= inputA OR inputB;
+			when "0000" => tmp <= inputA AND inputB;
+			when "0001" => tmp <= inputA OR inputB;
+			when "0010" => tmp <= inputA + inputB;
+			when "0110" => tmp <= inputA - inputB;
 			when "1100" => tmp <= inputA NOR inputB;
 			when others => tmp <= inputA + inputB;
 		end case;
-
 	end process;
 	zero <= '1' when tmp = X"00000000" else '0';
 	ALU_Result <= tmp;
 end alu;
 
 
+-- Register File Architecture
+
 library ieee;
 use ieee.std_logic_1164.all;
-
--- Register File Entity
+use ieee.std_logic_unsigned.all;
+use ieee.numeric_std.all;
 
 entity RegisterFile is port
 	(
-		reset, clock, we : in std_logic;
+		reset, clk, we : in std_logic;
 		readReg1, readReg2, writeReg: in std_logic_vector(4 downto 0);
 		writeData: in std_logic_vector(31 downto 0);
 		readData1, readData2: out std_logic_vector(31 downto 0)
@@ -65,18 +66,11 @@ entity RegisterFile is port
 end RegisterFile;
 
 
-
--- Register File Architecture
-
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
-
-architecture registerfile of RegisterFile is
+architecture Behavioral of RegisterFile is
 	type regArray is array(0 to 15) of std_logic_vector(31 downto 0);
 	signal regArr: regArray;
 begin
-	process(clock, reset)
+	process(clk, reset)
 	begin
 		if reset = '1' then
 			regArr(0) <= X"00000000";
@@ -95,9 +89,8 @@ begin
 			regArr(13) <= X"00000000";
 			regArr(14) <= X"00000000";
 			regArr(15) <= X"00000000";
-		end if;
 
-		if (clock'event and clock = '1') then
+		elsif (clk'event and clk = '1') then
 			if(we = '1') then
 				regArr(to_integer(unsigned(writeReg))) <= writeData;
 			end if;
@@ -105,7 +98,8 @@ begin
 	end process;
 	readData1 <= regArr(to_integer(unsigned(readReg1)));
 	readData2 <= regArr(to_integer(unsigned(readReg2)));
-end registerfile;
+
+end Behavioral;
 
 
 
@@ -130,7 +124,7 @@ end DataMemory;
 
 architecture datamem of DataMemory is
 	type memArray is array(0 to 15) of std_logic_vector(31 downto 0);
-	signal memArr: memArray;
+	signal memArr: memArray := (others => (others => '0'));
 
 begin
 	process(clock)
@@ -216,11 +210,11 @@ architecture InstructionMem of InstructionMemory is
 	signal Instructions: iArray := 
 	(
 		-- addi $0, $0, 0
-		"00100000000000000000000000000000",
+		--"00100000000000000000000000000000",
 		-- addi $2, $2, 0
-		"00100000010000100000000000000000",
+		--"00100000010000100000000000000000",
 		-- addi $2, $4, 0
-		"00100000100000100000000000000000",
+		--"00100000100000100000000000000000",
 		-- addi $3, $0, 1
 		"00100000000000110000000000000001",
 		-- addi $5, $0, 3
@@ -237,6 +231,9 @@ architecture InstructionMem of InstructionMemory is
 		"00100000101001011111111111111111",
 		-- bne $5, $0, L1
 		"00010100000001011111111111111011",
+		"00000000000000000000000000000000",
+		"00000000000000000000000000000000",
+		"00000000000000000000000000000000",
 		"00000000000000000000000000000000",
 		"00000000000000000000000000000000",
 		"00000000000000000000000000000000",
@@ -325,13 +322,14 @@ end Control;
 
 
 
+
 library ieee;
 use ieee.std_logic_1164.all;
 
 entity Control_Unit is port
 (
 	opcode: in std_logic_vector(5 downto 0);
-	RegDst, ALUSrc, MemtoReg, RegWrite, MemRead, MemWrite, Branch : out std_logic;
+	RegDst, ALUSrc, MemtoReg, RegWrite, MemRead, MemWrite, Branch, BNE : out std_logic;
 	ALUOp : out std_logic_vector(1 downto 0)
 	
 );
@@ -385,15 +383,16 @@ begin
 				MemWrite <= '1';
 				Branch <= '0';
 				ALUOp <= "00";
-			-- For Branch Instructions
-			when "000100" =>
+			-- For BNE Instructions
+			when "000101" =>
+				BNE <= '1';
 				RegDst <= 'X';
 				ALUSrc <= '0';
 				MemtoReg <= 'X';
 				RegWrite <= '0';
-				MemRead <= '0';
+				MemRead <= 'X';
 				MemWrite <= '0';
-				Branch <= '1';
+				Branch <= '0';
 				ALUOp <= "01";
 			when others =>
 		                RegDst    <= 'X';
@@ -407,7 +406,6 @@ begin
 		end case;
 	end process;
 end Behavioral;
-
 
 
 
@@ -446,7 +444,7 @@ architecture dataflow of MIPS is
 	signal aluop : std_logic_vector(1 downto 0);
 	signal writereg : std_logic_vector(4 downto 0);
 
-	signal regwrite_en : std_logic;
+	--signal regwrite_en : std_logic;
 	signal readdata1, readdata2 : std_logic_vector(31 downto 0);
 	
 	signal signExout : std_logic_vector(31 downto 0);
@@ -465,6 +463,11 @@ architecture dataflow of MIPS is
 	signal saddr : std_logic;
 	signal muxtopc : std_logic_vector(31 downto 0);
 
+	signal to_or : std_logic;
+	signal addrmuxS: std_logic;
+
+	signal bne : std_logic;
+
 	-- signal OPCode : std_logic_vector(5 downto 0);
 
 	-- ALU
@@ -481,7 +484,7 @@ architecture dataflow of MIPS is
 	-- Register File
 	component RegisterFile is port
 	(
-		reset, clock, we : in std_logic;
+		reset, clk, we : in std_logic;
 		readReg1, readReg2, writeReg : in std_logic_vector(4 downto 0);
 		writeData: in std_logic_vector(31 downto 0);
 		readData1, readData2 : out std_logic_vector(31 downto 0)
@@ -549,7 +552,7 @@ architecture dataflow of MIPS is
 	component Control_Unit is port
   	(
 	    opcode : std_logic_vector(5 downto 0);
-	    RegDst, ALUSrc, MemtoReg, RegWrite, MemRead, MemWrite, Branch : out std_logic;
+	    RegDst, ALUSrc, MemtoReg, RegWrite, MemRead, MemWrite, Branch, BNE : out std_logic;
 	    ALUOp : out std_logic_vector(1 downto 0)  
   	);
         end component Control_Unit;
@@ -608,8 +611,8 @@ begin
 		port map
 		(
 			reset => reset,
-			clock => clock,
-			we => regwrite_en,
+			clk => clock,
+			we => regwrite,
 			readReg1 => instr (25 downto 21),
 			readReg2 => instr (20 downto 16),
 			writeReg => writereg,
@@ -690,12 +693,15 @@ begin
 		);
 
 	saddr <= branch AND Zero;
+	to_or <= bne AND NOT Zero;
+	addrmuxS <= saddr OR to_or;
+	
 	addrmux : mux21_32
 		port map
 		(
 			A => PC_next,
 			B => addr2res,
-			S => saddr,
+			S => addrmuxS,
 			res => muxtopc
 		);
 end dataflow;

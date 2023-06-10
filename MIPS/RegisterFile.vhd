@@ -37,9 +37,7 @@ begin
 			regArr(13) <= X"00000000";
 			regArr(14) <= X"00000000";
 			regArr(15) <= X"00000000";
-		end if;
-
-		if (clk'event and clk = '1') then
+		elsif (clk'event and clk = '1') then
 			if(we = '1') then
 				regArr(to_integer(unsigned(writeReg))) <= writeData;
 			end if;
