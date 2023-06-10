@@ -2,8 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-
--- Data Memory Entity
+-- Data Memory
 
 entity DataMemory is port
 (
@@ -12,30 +11,11 @@ entity DataMemory is port
 	clock, memWrite_en, memRead: in std_logic;
 	readData: out std_logic_vector(31 downto 0)
 );
-
 end DataMemory;
+
 architecture datamem of DataMemory is
 	type memArray is array(0 to 15) of std_logic_vector(31 downto 0);
-	signal memaddr : std_logic_vector(31 downto 0);
-	signal memArr: memArray := 
-	(
-		X"00000000",
-		X"00000000",
-		X"00000000",
-		X"00000000",
-		X"00000000",
-		X"00000000",
-		X"00000000",
-		X"00000000",
-		X"00000000",
-		X"00000000",
-		X"00000000",
-		X"00000000",
-		X"00000000",
-		X"00000000",
-		X"00000000",
-		X"00000000"
-	);
+	signal memArr: memArray := (others => (others => '0'));
 
 begin
 	process(clock)

@@ -1,10 +1,10 @@
+-- General Control Unit for the Circuit
 
 library ieee;
 use ieee.std_logic_1164.all;
 
 entity Control_Unit is port
 (
-	reset : in std_logic;
 	opcode: in std_logic_vector(5 downto 0);
 	RegDst, ALUSrc, MemtoReg, RegWrite, MemRead, MemWrite, Branch, BNE : out std_logic;
 	ALUOp : out std_logic_vector(1 downto 0)
@@ -16,7 +16,6 @@ architecture Behavioral of Control_Unit is
 begin
 	process(opcode)
 	begin
-		
 		case opcode is
 			-- For add and sub Instructions
 			when "000000" =>
@@ -63,24 +62,25 @@ begin
 				ALUOp <= "00";
 			-- For BNE Instructions
 			when "000101" =>
-				BNE <= '1';
 				RegDst <= 'X';
 				ALUSrc <= '0';
 				MemtoReg <= 'X';
 				RegWrite <= '0';
 				MemRead <= '0';
 				MemWrite <= '0';
-				Branch <= '0';
-				ALUOp <= "01";
+				Branch <= '1';
+				ALUOp <= "11";
+			-- For others
 			when others =>
-		                RegDst    <= 'X';
-		                ALUSrc    <= 'X';
-		                MemtoReg  <= 'X';
-		                RegWrite  <= 'X';
-		                MemRead   <= 'X';
-		                MemWrite  <= 'X';
-		                Branch    <= 'X';
-		                ALUOp     <= "XX";
+		                RegDst    <= '0';
+		                ALUSrc    <= '0';
+		                MemtoReg  <= '0';
+		                RegWrite  <= '0';
+		                MemRead   <= '0';
+		                MemWrite  <= '0';
+		                Branch    <= '0';
+		                ALUOp     <= "00";
 		end case;
 	end process;
 end Behavioral;
+

@@ -1,3 +1,4 @@
+-- Sign Extension
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -8,7 +9,6 @@ use ieee.std_logic_1164.all;
 		outBits: out std_logic_vector(31 downto 0)
 	);
 end SignExtension;
-
 
 architecture SignEx of SignExtension is
 begin
