@@ -6,7 +6,7 @@ use ieee.std_logic_1164.all;
 entity Control_Unit is port
 (
 	opcode: in std_logic_vector(5 downto 0);
-	RegDst, ALUSrc, MemtoReg, RegWrite, MemRead, MemWrite, Branch, BNE : out std_logic;
+	RegDst, ALUSrc, MemtoReg, RegWrite, MemRead, MemWrite, Branch : out std_logic;
 	ALUOp : out std_logic_vector(1 downto 0)
 	
 );
