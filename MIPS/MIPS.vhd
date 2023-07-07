@@ -1,18 +1,6 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
-
--- MIPS Entity
-
-entity MIPS is port
-(
-	clock, reset: in std_logic
-);
-end MIPS;
-
-
-library ieee;
-use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 
 -- ALU Entity
@@ -414,6 +402,15 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.numeric_std.all;
+
+
+-- MIPS Entity
+
+entity MIPS is port
+(
+	clock, reset: in std_logic
+);
+end MIPS;
 
 
 -- MIPS Architecture
