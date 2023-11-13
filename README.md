@@ -1,6 +1,6 @@
 # MIPS-Single-Cycle
 
-## * This is an implementation of a 32-bit Single Cycle MIPS Processor. Note that the processor does not support the jump instruction.
+* ## This is an implementation of a 32-bit Single Cycle MIPS Processor. Note that the processor does not support the jump instruction.
 
 ### The Instruction Memory in this specific example contains the instructions below :
 ```
