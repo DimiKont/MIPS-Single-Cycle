@@ -4,7 +4,7 @@
 **NOTE** This specific processor does not support the jump instruction
 
 ### The Instruction Memory in this specific example contains the instructions below :
-```VHDL
+```
   addi $3, $0, 1     <-> 001000 00000 00011 0000000000000001
 
   addi $5, $0, 3     <-> 001000 00000 00101 0000000000000011
