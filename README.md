@@ -2,7 +2,7 @@
 
 **NOTE** This specific processor does not support the jump instruction
 
-### The Instruction Memory in this specific example contains the instructions below :
+### The Instruction Memory in this specific example contains the following instructions:
 ```vhdl
   addi $3, $0, 1     <-> 001000 00000 00011 0000000000000001
 
