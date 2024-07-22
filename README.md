@@ -1,6 +1,6 @@
 # Implementation of a 32-bit Single Cycle MIPS Processor. <br>
 
-**NOTE** This specific processor does not support the jump instruction
+**NOTE:** This specific processor does not support the jump instruction
 
 ### The Instruction Memory in this specific example contains the following instructions:
 ```vhdl
